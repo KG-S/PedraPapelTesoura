@@ -6,24 +6,29 @@ import java.net.*;
 public class Servidor {
 
     public static void main(String[] args) {
+
         try {
+
             ServerSocket servidor = new ServerSocket(5000);
 
             System.out.println("Servidor iniciado...");
-            System.out.println("Aguardando jogador 1...");
+            System.out.println("Aguardando Jogador 1...");
 
             Socket jogador1 = servidor.accept();
             System.out.println("Jogador 1 conectado!");
 
-            System.out.println("Aguardando jogador 2...");
+            System.out.println("Aguardando Jogador 2...");
+
             Socket jogador2 = servidor.accept();
             System.out.println("Jogador 2 conectado!");
 
             BufferedReader entrada1 =
-                    new BufferedReader(new InputStreamReader(jogador1.getInputStream()));
+                    new BufferedReader(
+                            new InputStreamReader(jogador1.getInputStream()));
 
             BufferedReader entrada2 =
-                    new BufferedReader(new InputStreamReader(jogador2.getInputStream()));
+                    new BufferedReader(
+                            new InputStreamReader(jogador2.getInputStream()));
 
             PrintWriter saida1 =
                     new PrintWriter(jogador1.getOutputStream(), true);
@@ -31,8 +36,8 @@ public class Servidor {
             PrintWriter saida2 =
                     new PrintWriter(jogador2.getOutputStream(), true);
 
-            saida1.println("Digite PEDRA, PAPEL ou TESOURA:");
-            saida2.println("Digite PEDRA, PAPEL ou TESOURA:");
+            saida1.println("Escolha PEDRA, PAPEL ou TESOURA");
+            saida2.println("Escolha PEDRA, PAPEL ou TESOURA");
 
             String jogada1 = entrada1.readLine().toUpperCase();
             String jogada2 = entrada2.readLine().toUpperCase();
@@ -51,10 +56,10 @@ public class Servidor {
         }
     }
 
-    public static String verificarVencedor(String j1, String j2) {
+    private static String verificarVencedor(String j1, String j2) {
 
         if (j1.equals(j2)) {
-            return "EMPATE!";
+            return "EMPATE! (" + j1 + " x " + j2 + ")";
         }
 
         if (
