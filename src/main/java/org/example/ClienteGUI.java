@@ -7,117 +7,124 @@ import java.net.Socket;
 
 public class ClienteGUI extends JFrame {
 
-    private JTextArea areaMensagens;
-    private PrintWriter saida;
-    private BufferedReader entrada;
+    private JTextArea area;
+    private PrintWriter out;
+    private BufferedReader in;
+
+    private JButton pedra, papel, tesoura;
+
+    private boolean esperandoResultado = false;
 
     public ClienteGUI() {
 
         setTitle("Pedra Papel Tesoura");
-        setSize(500, 350);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(700, 500);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JLabel titulo =
-                new JLabel("PEDRA PAPEL TESOURA TCP",
-                        SwingConstants.CENTER);
+        getContentPane().setBackground(new Color(30,30,30));
+        setLayout(new BorderLayout());
 
-        titulo.setFont(new Font("Arial", Font.BOLD, 22));
+        JLabel titulo = new JLabel("JOGO", SwingConstants.CENTER);
+        titulo.setFont(new Font("Arial", Font.BOLD, 26));
+        titulo.setForeground(Color.ORANGE);
 
-        areaMensagens = new JTextArea();
-        areaMensagens.setEditable(false);
+        area = new JTextArea();
+        area.setEditable(false);
+        area.setBackground(new Color(45,45,45));
+        area.setForeground(Color.WHITE);
 
-        JButton pedra = new JButton("🪨 PEDRA");
-        JButton papel = new JButton("📄 PAPEL");
-        JButton tesoura = new JButton("✂️ TESOURA");
+        JScrollPane scroll = new JScrollPane(area);
 
-        JPanel painelBotoes = new JPanel();
+        pedra = botao("PEDRA");
+        papel = botao("PAPEL");
+        tesoura = botao("TESOURA");
 
-        painelBotoes.add(pedra);
-        painelBotoes.add(papel);
-        painelBotoes.add(tesoura);
+        JPanel botoes = new JPanel();
+        botoes.setBackground(new Color(30,30,30));
+
+        botoes.add(pedra);
+        botoes.add(papel);
+        botoes.add(tesoura);
 
         add(titulo, BorderLayout.NORTH);
-        add(new JScrollPane(areaMensagens), BorderLayout.CENTER);
-        add(painelBotoes, BorderLayout.SOUTH);
+        add(scroll, BorderLayout.CENTER);
+        add(botoes, BorderLayout.SOUTH);
 
-        conectarServidor();
+        conectar();
 
-        pedra.addActionListener(e -> enviarJogada("PEDRA"));
-        papel.addActionListener(e -> enviarJogada("PAPEL"));
-        tesoura.addActionListener(e -> enviarJogada("TESOURA"));
+        pedra.addActionListener(e -> jogar("PEDRA"));
+        papel.addActionListener(e -> jogar("PAPEL"));
+        tesoura.addActionListener(e -> jogar("TESOURA"));
 
         setVisible(true);
     }
 
-    private void conectarServidor() {
+    private JButton botao(String t) {
+        JButton b = new JButton(t);
+        b.setFont(new Font("Arial", Font.BOLD, 12));
+        b.setPreferredSize(new Dimension(100,40));
+        return b;
+    }
+
+    private void conectar() {
 
         try {
+            Socket s = new Socket("localhost", 5000);
 
-            Socket socket = new Socket("localhost", 5000);
+            in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            out = new PrintWriter(s.getOutputStream(), true);
 
-            entrada = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream()));
-
-            saida = new PrintWriter(
-                    socket.getOutputStream(), true);
-
-            areaMensagens.append("Conectado ao servidor.\n");
+            area.append("Conectado ao servidor!\n");
 
             new Thread(() -> {
 
                 try {
 
-                    String mensagem;
+                    String msg;
 
-                    while ((mensagem = entrada.readLine()) != null) {
+                    while ((msg = in.readLine()) != null) {
 
-                        areaMensagens.append(mensagem + "\n");
+                        area.append(msg + "\n");
 
-                        if (mensagem.contains("venceu")
-                                || mensagem.contains("EMPATE")) {
-
-                            JOptionPane.showMessageDialog(
-                                    this,
-                                    mensagem,
-                                    "Resultado",
-                                    JOptionPane.INFORMATION_MESSAGE
-                            );
+                        if (msg.startsWith("RESULTADO:")) {
+                            esperandoResultado = false;
+                            liberarBotoes(true);
                         }
                     }
 
                 } catch (Exception e) {
-
-                    areaMensagens.append(
-                            "\nConexão encerrada.\n");
+                    area.append("Desconectado\n");
                 }
 
             }).start();
 
         } catch (Exception e) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Não foi possível conectar ao servidor."
-            );
+            JOptionPane.showMessageDialog(this, "Erro ao conectar");
         }
     }
 
-    private void enviarJogada(String jogada) {
+    private void jogar(String jogada) {
 
-        if (saida != null) {
+        if (esperandoResultado) return;
 
-            saida.println(jogada);
+        esperandoResultado = true;
 
-            areaMensagens.append(
-                    "Você escolheu: " + jogada + "\n");
-        }
+        liberarBotoes(false);
+
+        out.println(jogada);
+
+        area.append("Você jogou: " + jogada + "\n");
+    }
+
+    private void liberarBotoes(boolean ativo) {
+
+        pedra.setEnabled(ativo);
+        papel.setEnabled(ativo);
+        tesoura.setEnabled(ativo);
     }
 
     public static void main(String[] args) {
-
-        SwingUtilities.invokeLater(
-                ClienteGUI::new
-        );
+        SwingUtilities.invokeLater(ClienteGUI::new);
     }
 }

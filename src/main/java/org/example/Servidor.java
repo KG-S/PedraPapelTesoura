@@ -8,68 +8,52 @@ public class Servidor {
     public static void main(String[] args) {
 
         try {
-
             ServerSocket servidor = new ServerSocket(5000);
 
             System.out.println("Servidor iniciado...");
-            System.out.println("Aguardando Jogador 1...");
 
-            Socket jogador1 = servidor.accept();
-            System.out.println("Jogador 1 conectado!");
+            Socket j1 = servidor.accept();
+            Socket j2 = servidor.accept();
 
-            System.out.println("Aguardando Jogador 2...");
+            BufferedReader in1 = new BufferedReader(new InputStreamReader(j1.getInputStream()));
+            BufferedReader in2 = new BufferedReader(new InputStreamReader(j2.getInputStream()));
 
-            Socket jogador2 = servidor.accept();
-            System.out.println("Jogador 2 conectado!");
+            PrintWriter out1 = new PrintWriter(j1.getOutputStream(), true);
+            PrintWriter out2 = new PrintWriter(j2.getOutputStream(), true);
 
-            BufferedReader entrada1 =
-                    new BufferedReader(
-                            new InputStreamReader(jogador1.getInputStream()));
+            out1.println("Jogo iniciado!");
+            out2.println("Jogo iniciado!");
 
-            BufferedReader entrada2 =
-                    new BufferedReader(
-                            new InputStreamReader(jogador2.getInputStream()));
+            while (true) {
 
-            PrintWriter saida1 =
-                    new PrintWriter(jogador1.getOutputStream(), true);
+                String p1 = in1.readLine().toUpperCase();
+                String p2 = in2.readLine().toUpperCase();
 
-            PrintWriter saida2 =
-                    new PrintWriter(jogador2.getOutputStream(), true);
+                String resultado = resultado(p1, p2);
 
-            saida1.println("Escolha PEDRA, PAPEL ou TESOURA");
-            saida2.println("Escolha PEDRA, PAPEL ou TESOURA");
+                out1.println("RESULTADO: " + resultado);
+                out2.println("RESULTADO: " + resultado);
 
-            String jogada1 = entrada1.readLine().toUpperCase();
-            String jogada2 = entrada2.readLine().toUpperCase();
-
-            String resultado = verificarVencedor(jogada1, jogada2);
-
-            saida1.println(resultado);
-            saida2.println(resultado);
-
-            jogador1.close();
-            jogador2.close();
-            servidor.close();
+                out1.println("JOGO NOVO");
+                out2.println("JOGO NOVO");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static String verificarVencedor(String j1, String j2) {
+    static String resultado(String a, String b) {
 
-        if (j1.equals(j2)) {
-            return "EMPATE! (" + j1 + " x " + j2 + ")";
+        if (a.equals(b))
+            return "EMPATE (" + a + " x " + b + ")";
+
+        if ((a.equals("PEDRA") && b.equals("TESOURA")) ||
+                (a.equals("PAPEL") && b.equals("PEDRA")) ||
+                (a.equals("TESOURA") && b.equals("PAPEL"))) {
+            return "Jogador 1 venceu (" + a + " x " + b + ")";
         }
 
-        if (
-                (j1.equals("PEDRA") && j2.equals("TESOURA")) ||
-                        (j1.equals("PAPEL") && j2.equals("PEDRA")) ||
-                        (j1.equals("TESOURA") && j2.equals("PAPEL"))
-        ) {
-            return "Jogador 1 venceu! (" + j1 + " x " + j2 + ")";
-        }
-
-        return "Jogador 2 venceu! (" + j2 + " x " + j1 + ")";
+        return "Jogador 2 venceu (" + b + " x " + a + ")";
     }
 }
