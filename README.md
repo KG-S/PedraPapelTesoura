@@ -9,6 +9,17 @@ Projeto desenvolvido para a disciplina de **Redes de Computadores**, com o objet
 - Letícia Kaori Yabuuti
 - Valéria da Silva Sartorio
 
+## Documentação
+
+[Documento Trabalho de Redes de Computadores - Sockets](https://github.com/KG-S/PedraPapelTesoura/blob/main/Trabalho%20de%20Redes%20de%20Computadores_%20Sockets%20-%20Erick%2C%20Kaua%2C%20Leticia%20e%20Valeria.pdf)
+
+## Demonstração
+
+Vídeo de demonstração do projeto:
+
+[Assista no YouTube](https://youtu.be/47Lj4Asa8C4?is=GInsCt7uycpIcEAC)
+
+
 ## Sobre o Projeto
 
 O **Supimpa Jokenpô** é uma implementação digital do clássico jogo **Pedra, Papel e Tesoura**, permitindo que dois jogadores disputem partidas através de uma conexão de rede.
@@ -99,12 +110,6 @@ O projeto foi desenvolvido em **Java**, utilizando suporte nativo para programa�
 - `ServerSocket`
 - `InputStream`
 - `OutputStream`
-
-## Demonstração
-
-Vídeo de demonstração do projeto:
-
-[Assista no YouTube](https://youtu.be/47Lj4Asa8C4?is=GInsCt7uycpIcEAC)
 
 ## Como Executar
 
